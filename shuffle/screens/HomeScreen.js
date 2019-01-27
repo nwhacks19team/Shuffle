@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Button,
 } from 'react-native';
 import { WebBrowser } from 'expo';
 
@@ -19,46 +20,80 @@ export default class HomeScreen extends React.Component {
 
   render() {
     return (
+
       <View style={styles.container}>
+
+        <Text style={styles.titleText}>Nearby Users:</Text>
+
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-          <View style={styles.welcomeContainer}>
-            <Image
-              source={
-                __DEV__
-                  ? require('../assets/images/robot-dev.png')
-                  : require('../assets/images/robot-prod.png')
-              }
-              style={styles.welcomeImage}
-            />
-          </View>
-
-          <View style={styles.getStartedContainer}>
-            {this._maybeRenderDevelopmentModeWarning()}
-
-            <Text style={styles.getStartedText}>Get started by opening</Text>
-
-            <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-              <MonoText style={styles.codeHighlightText}>screens/HomeScreen.js</MonoText>
-            </View>
-
-            <Text style={styles.getStartedText}>
-              Change this text and your app will automatically reload.
-            </Text>
-          </View>
-
-          <View style={styles.helpContainer}>
+          
+          <View style={styles.userContainer}>
             <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
+              <Text style={styles.helpLinkText}>User 1</Text>
             </TouchableOpacity>
           </View>
+
+          <View style={styles.userContainer}>
+            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
+              <Text style={styles.helpLinkText}>User 2</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.userContainer}>
+            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
+              <Text style={styles.helpLinkText}>User 3</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.userContainer}>
+            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
+              <Text style={styles.helpLinkText}>User 4</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.userContainer}>
+            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
+              <Text style={styles.helpLinkText}>User 5</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.userContainer}>
+            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
+              <Text style={styles.helpLinkText}>User 6</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.userContainer}>
+            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
+              <Text style={styles.helpLinkText}>User 7</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.userContainer}>
+            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
+              <Text style={styles.helpLinkText}>User 8</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.userContainer}>
+            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
+              <Text style={styles.helpLinkText}>User 5</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.userContainer}>
+            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
+              <Text style={styles.helpLinkText}>User 5</Text>
+            </TouchableOpacity>
+          </View>
+
         </ScrollView>
 
         <View style={styles.tabBarInfoContainer}>
-          <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
-
-          <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-            <MonoText style={styles.codeHighlightText}>navigation/MainTabNavigator.js</MonoText>
-          </View>
+          <Button
+            onPress={()=>{}}
+            title="Generate"
+          />
         </View>
       </View>
     );
@@ -140,10 +175,11 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     paddingHorizontal: 4,
   },
-  getStartedText: {
-    fontSize: 17,
+  titleText: {
+    fontSize: 28,
     color: 'rgba(96,100,109, 1)',
-    lineHeight: 24,
+    marginTop: 50,
+    lineHeight: 28,
     textAlign: 'center',
   },
   tabBarInfoContainer: {
@@ -174,7 +210,7 @@ const styles = StyleSheet.create({
   navigationFilename: {
     marginTop: 5,
   },
-  helpContainer: {
+  userContainer: {
     marginTop: 15,
     alignItems: 'center',
   },
@@ -182,7 +218,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
   },
   helpLinkText: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#2e78b7',
   },
 });
