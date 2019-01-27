@@ -11,20 +11,18 @@ import {
   Picker,
 } from 'react-native';
 import { WebBrowser } from 'expo';
+import SelectMultiple from 'react-native-select-multiple'
 
 import { MonoText } from '../components/StyledText';
 
 export default class HomeScreen extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.state = { /* initial state */ };
-    selected.clear();
+  state = { selectedUsers: [] }
+
+  onSelectionsChange = (selectedUsers) => {
+    this.setState({ selectedUsers })
   }
 
-  static navigationOptions = {
-    header: null,
-  };
 
   render() {
     return (
@@ -33,39 +31,16 @@ export default class HomeScreen extends React.Component {
 
         <Text style={styles.titleText}>Nearby Users:</Text>
 
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-          
-          <View style={styles.userContainer}>
-            <TouchableOpacity onPress={this._handleUserPress("arjan")} style={styles.userLink}>
-              <Text style={styles.userLinkText}>Arjan</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.userContainer}>
-            <TouchableOpacity onPress={this._handleUserPress("jennifer")} style={styles.userLink}>
-              <Text style={styles.userLinkText}>Jennifer</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.userContainer}>
-            <TouchableOpacity onPress={this._handleUserPress("karan")} style={styles.userLink}>
-              <Text style={styles.userLinkText}>Karan</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.userContainer}>
-            <TouchableOpacity onPress={this._handleUserPress("pahal")} style={styles.userLink}>
-              <Text style={styles.userLinkText}>Pahal</Text>
-            </TouchableOpacity>
-          </View>
-
-        </ScrollView>
+        <SelectMultiple
+          items={users}
+          selectedItems={this.state.selectedUsers}
+          onSelectionsChange={this.onSelectionsChange} />
 
         <View style={styles.tabBarInfoContainer}>
           <Button
             style={styles.generateButton}
-            onPress={()=>{}}
-            title="Generate"
+            onPress={this._generateSet}
+            title="Generate a Playlist"
           />
         </View>
       </View>
@@ -99,21 +74,20 @@ export default class HomeScreen extends React.Component {
     WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
   };
 
-  _handleUserPress = (user) => {
+  _generateSet = () => {
+    console.log(this.state.selectedUsers);
 
-    if(selected.has(user)){
-      selected.delete(user);
-    }
-    else{
-      selected.add(user);
-    }
     
-    console.log(selected)
-  };
+  }
 }
 
-var selected = new Set()
-
+const users = [
+  { label: 'Arjan', value: 'arjansandhu' },
+  { label: 'Jennifer', value: 'idk' },
+  { label: 'Karan', value: 'karanrahal' },
+  { label: 'Pahal', value: 'dontClickThisMans' },
+  { label: 'Nishat', value: 'nishnish97' }
+]
 
 const styles = StyleSheet.create({
   container: {
