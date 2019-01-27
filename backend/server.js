@@ -6,8 +6,8 @@ const port = 3000;
 
 app.get('/', (req, res) => res.send('Hello World!'));
 
-const token1 = 'BQBfpL-Fm6Z5n8N3pdKsVR8OGt6-Hwk-QAPHGdHxajj0DCitmw1FlPUgu0QoK-a_h6AYUJMO8hEc3H2wUxzYuKIVSM2maUL9MvgoMo8F2ey6cLOCBtVNkaDqhF5kL2oiLG1KRWUnqsLUKizyJzFT1ziZLRqf0Jj4QZvspnzWus3zU8gYTrS_n7TFi6T8u28jn1dGfaphUek1DqLGIXLwmSRBYH2CTxeqfL_Ggf7PkJc_ebHJCNyb6CPNem1xSlbGaml8tTxxUOlnNwQlkxp3';
-const token2 = 'BQCBnvqwIdlByZF9nQY8FA4bYep4pZu95mrz0QDQ9tnYqB5iOMmKxG4TbCZ-h4ztNTrEOpWB-eqvCESOuAjToGybtwqOI7CPZofrhe1vM_Rzi9X36LWPKDsQbgvTdKnRIk0p4ou4lVPvlh8ShZlJXwTh30zbvLseirMfmmaC3w7lTAjtVZxv3OA5MXG_T2eBTDpdNsfYKlbCwmsYhCPIKhdZ71JKmCS8jSFHpXBP'
+const token1 = 'BQB1cbfGOpPQHJAP0G-k3otg-s26brl7xhNT9UpQD3_YA7FpBeYmFWp55hi7qpIpgZ1_lso_K688HWsSyFs-7adChYLvCsWtXrOcRkhlBTnifij0vpWeztWLR9CMTqN4nM1D6duQJqWOzQ-EgZ0BrO1Lu1lPYHHFZ2ObbATAhVbcX5EdPl_55OMVJ9DENcj3F3rwb94u0Z10dFOv3kL4RDXgHh70iOzXG1fFRHyRpcA35aui5aAg3fH6mpg7rUCBfIvMSVBf2iG1fgQFQwop';
+const token2 = 'BQAARQhooJywJznW-Bk7lq44SiCEO3CFAs1mjIxccpcoTAG6z1gMermwD8NquaDxv6sDlC8xEVEW2eNJ-BlBWINCpwrYBc4-EmgVGGLIMg7NDUpsgd6-OaBx7OkfMNYO0yreuOHr32joqexc8Qt9QoMb8R1exHNHUurPXtAYRJnd78z1hkEgqRaahOib9QE9fqCisbM-qiy3vcvV6lwbrkLVdTZhnur5UoJ4Sp_r'
 const URIArrays = [];
 const tokens = [];
 const finalSongList = [];
@@ -83,7 +83,7 @@ const parseSongs = (songsBody) => {
     count++;
     songBody = songsBody[i];
     uri = songBody.uri;
-    URIArray.push(uri.substring(uri.indexOf('track:')+6))
+    URIArray.push(uri)
   }
   if(count == songsBody.length){
     URIArrays.push(URIArray);
