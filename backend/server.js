@@ -1,5 +1,6 @@
 const express = require('express');
 const request = require('request');
+const bodyParser = require('body-parser');
 const Pool = require('pg').Pool
 
 const pool = new Pool({
@@ -11,21 +12,27 @@ const pool = new Pool({
 });
 
 const app = express();
-const port = 3000;
+const port = 8080;
+const ipAddress = '10.19.130.200';
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.get('/', (req, res) => res.send('Hello World!'));
 
 const URIArrays = [];
 const finalSongList = [];
-const originalToken = 'BQDN8bENR9sKLkPm_hlwEBlp87S-Z_2EYQhckA7CFmm56bBW4Xlza0VL7kWE1Iq-Pr6bUIpqnhqMKygS6gvGYxMfPWKeA971OVqfxi9WNjCHhboj9fxXunXw94Qm4wtW70GGm6bcdeBKdSI-IwSJ9Eu8dGevcPIAgWfgjMFzE6zUKEx16gQxdPm5zQxH_Lwoqsusjf2pAtmtx-4zSbnqFUdxOcuvDoBX4lK5tk0G';
+let originalToken = '';
 const tokens = [];
 let pArr = [];
 
 // API endpoint - playlist generation
 // req: array of usernames
 // res: success/error message
-app.get('/playlist', async (req, res) => {
-  const users = ['Karn', 'Pahul'];
+app.post('/playlist', (req, res) => {
+  const users = req.body.users;
+  console.log(req.body.users);
+  
   let params = [];
   for(var i = 1; i <= users.length; i++) {
     params.push('$' + i);
@@ -37,11 +44,13 @@ app.get('/playlist', async (req, res) => {
       console.log(error);
     }
 
-    console.log(results.rows);
     // generate list of tokens
     for (let i = 0; i < results.rows.length; i++) {
       tokens.push(results.rows[i].token);
     }
+
+    originalToken = results.rows[0].token; // set token for original user
+    console.log(originalToken);
 
     // get list of songs shared
     for(i = 0; i < tokens.length; i++){
@@ -49,18 +58,18 @@ app.get('/playlist', async (req, res) => {
     }
 
     // create new Spotify playlist and add songs
-    const username = 'karnrahal';
-    const playlistName = 'Shuffle';
+    const username = users[0];
+    const playlistName = 'Shared Playlist 2';
     Promise.all(pArr).then(() => {
-      createNewPlaylist(username, playlistName, finalSongList);
+      createNewPlaylist(username, playlistName);
     })
 
-    res.send('You have successfully made a playlist!');
+    res.sendStatus(200);
   });
 });
 
 // Start express server
-app.listen(port, () => console.log(`Shuffle listening on port ${port}!`));
+app.listen(port, ipAddress, () => console.log(`Shuffle listening on port ${port}!`));
 
 
 /*
@@ -70,10 +79,9 @@ app.listen(port, () => console.log(`Shuffle listening on port ${port}!`));
  * returns: None
  */
 const getSharedSongs = (token) => {
-  // options to get users top 50 tracks
-  // token = 'BQDN8bENR9sKLkPm_hlwEBlp87S-Z_2EYQhckA7CFmm56bBW4Xlza0VL7kWE1Iq-Pr6bUIpqnhqMKygS6gvGYxMfPWKeA971OVqfxi9WNjCHhboj9fxXunXw94Qm4wtW70GGm6bcdeBKdSI-IwSJ9Eu8dGevcPIAgWfgjMFzE6zUKEx16gQxdPm5zQxH_Lwoqsusjf2pAtmtx-4zSbnqFUdxOcuvDoBX4lK5tk0G';
   return new Promise((fulfill, reject) => {
     try {
+      // options to get users top 50 tracks
       const options = {
         url: 'https://api.spotify.com/v1/me/top/tracks',
         headers: {
@@ -148,7 +156,7 @@ const parseSongs = (songsBody) => {
  * params: String username, String playlistName
  * returns: Nothing
  */
-const createNewPlaylist = (username, playlistName, songs, token) => {
+const createNewPlaylist = (username, playlistName) => {
   // options to create new playlist
   const options2 = {
     url: 'https://api.spotify.com/v1/users/' + username + '/playlists',
@@ -167,12 +175,12 @@ const createNewPlaylist = (username, playlistName, songs, token) => {
   // post request to create new shared playlist
   request.post(options2, function (error, response, body) {
     console.log('error:', error); // Print the error if one occurred
-    console.log('response', response);
+    // console.log('response', response);
     console.log('statusCode for create playlist:', response.statusCode);
 
     playlistID = body.id;
     console.log("PlaylistID:", playlistID);
-    addSongsToPlaylist(playlistID, songs);
+    addSongsToPlaylist(playlistID);
   });
 }
 
@@ -182,7 +190,7 @@ const createNewPlaylist = (username, playlistName, songs, token) => {
  * params: String playlstID, Array songs
  * returns: none
  */
-const addSongsToPlaylist = (playlistID, songs) => {
+const addSongsToPlaylist = (playlistID) => {
   const options3 = {
     url: 'https://api.spotify.com/v1/playlists/' + playlistID + '/tracks',
     headers: {
@@ -198,7 +206,7 @@ const addSongsToPlaylist = (playlistID, songs) => {
   // put request to add songs from shared_arr
   request.post(options3, function (error, response, body) {
     console.log('error:', error); // Print the error if one occurred
-    console.log('response', response);
+    // console.log('response', response);
     console.log('statusCode for playlistid:', response.statusCode);
   });
 };
