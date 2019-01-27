@@ -40,7 +40,7 @@ export default class HomeScreen extends React.Component {
           <Button
             style={styles.generateButton}
             onPress={this._generateSet}
-            title="Generate"
+            title="Generate a Playlist"
           />
         </View>
       </View>
