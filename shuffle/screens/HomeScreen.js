@@ -23,13 +23,16 @@ export default class HomeScreen extends React.Component {
     this.setState({ selectedUsers })
   }
 
+  static navigationOptions = {
+    title: 'Nearby Users',
+  };
 
   render() {
     return (
 
       <View style={styles.container}>
 
-        <Text style={styles.titleText}>Nearby Users:</Text>
+        {/* <Text style={styles.titleText}>Nearby Users:</Text> */}
 
         <SelectMultiple
           items={users}
@@ -37,12 +40,13 @@ export default class HomeScreen extends React.Component {
           onSelectionsChange={this.onSelectionsChange} />
 
         <View style={styles.tabBarInfoContainer}>
-          <Button
+          {(this.state.selectedUsers.length > 0) ? <Button
             style={styles.generateButton}
             onPress={this._generateSet}
             title="Generate a Playlist"
-          />
+          /> : null}
         </View>
+        
       </View>
     );
   }

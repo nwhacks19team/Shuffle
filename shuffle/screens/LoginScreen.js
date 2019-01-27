@@ -1,15 +1,16 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Button } from 'react-native';
+import { View, StyleSheet, Button } from 'react-native';
 import SpotifyWebApi from 'react-native-spotify-web-api';
+import { TextInput } from 'react-native-gesture-handler';
 
-export default class LinksScreen extends React.Component {
+export default class LoginScreen extends React.Component {
   static navigationOptions = {
     title: 'Login',
   };
 
   render() {
     return (
-      <ScrollView style={styles.container}>
+      <View style={styles.container}>
 
         <Button
           onPress={() => {
@@ -25,10 +26,10 @@ export default class LinksScreen extends React.Component {
                 console.log('Something went wrong when retrieving an access token', err.message);
               });
           }}
-          title="Login"
+          title="Login with Spotify"
         />
         
-      </ScrollView>
+      </View>
     );
   }
 }
@@ -44,5 +45,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 15,
     backgroundColor: '#fff',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
