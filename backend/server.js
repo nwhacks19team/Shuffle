@@ -1,6 +1,14 @@
 const express = require('express');
 const request = require('request');
-const db = require('./queries')
+const Pool = require('pg').Pool
+
+const pool = new Pool({
+  user: 'me',
+  host: 'localhost',
+  database: 'shuffle',
+  password: 'password',
+  port: 5432,
+});
 
 const app = express();
 const port = 3000;
@@ -9,44 +17,50 @@ app.get('/', (req, res) => res.send('Hello World!'));
 
 const URIArrays = [];
 const finalSongList = [];
+const originalToken = 'BQAiq3602hqfTY00VZOhlsAwIkTLcFSXIi8DbQdlsVBPDToz6vTpLsI6PfbZ5diDTDe3X1kLwhZmjheU5BCiKFWNl4ct4mQbtXAqsvQ7S5IFvEx2lEaxUZ0QZuTy8lWmgTbubtkDp_ZPQ9xMMZEncgJXu2pN2vktOOE6tmOmi0WogU2A_Gmj_g4n6wGBdNSYnTiYGlz_IozezGIUe1TPxF_neY3Q59jPx';
+const tokens = [];
+let pArr = [];
 
 // API endpoint - playlist generation
 // req: array of usernames
 // res: success/error message
-app.get('/playlist', (req, res) => {
-  const users = ['Karn']; // get usernames from req
-  const tokens = db.getTokens(users); // get tokens from db
+app.get('/playlist', async (req, res) => {
+  const users = ['Karn', 'Pahul'];
+  let params = [];
+  for(var i = 1; i <= users.length; i++) {
+    params.push('$' + i);
+  }
+  const text = 'SELECT token FROM users WHERE username IN (' + params.join(',') + ')';
 
-  console.log(tokens);
+  pool.query(text, users, (error, results) => {
+    if (error) {
+      console.log(error);
+    }
 
-  // for (token in tokens) {
-  //   console.log(token);
-  // }
+    console.log(results.rows);
+    // generate list of tokens
+    for (let i = 0; i < results.rows.length; i++) {
+      tokens.push(results.rows[i].token);
+    }
 
-  // const token1 = 'BQB1cbfGOpPQHJAP0G-k3otg-s26brl7xhNT9UpQD3_YA7FpBeYmFWp55hi7qpIpgZ1_lso_K688HWsSyFs-7adChYLvCsWtXrOcRkhlBTnifij0vpWeztWLR9CMTqN4nM1D6duQJqWOzQ-EgZ0BrO1Lu1lPYHHFZ2ObbATAhVbcX5EdPl_55OMVJ9DENcj3F3rwb94u0Z10dFOv3kL4RDXgHh70iOzXG1fFRHyRpcA35aui5aAg3fH6mpg7rUCBfIvMSVBf2iG1fgQFQwop';
-  // const token2 = 'BQAARQhooJywJznW-Bk7lq44SiCEO3CFAs1mjIxccpcoTAG6z1gMermwD8NquaDxv6sDlC8xEVEW2eNJ-BlBWINCpwrYBc4-EmgVGGLIMg7NDUpsgd6-OaBx7OkfMNYO0yreuOHr32joqexc8Qt9QoMb8R1exHNHUurPXtAYRJnd78z1hkEgqRaahOib9QE9fqCisbM-qiy3vcvV6lwbrkLVdTZhnur5UoJ4Sp_r'
-  // const tokens = [];
-  // tokens.push(token1);
-  // tokens.push(token2);
-  
-  // // get list of songs shared
-  // for(i = 0; i < tokens.length; i++){
-  //   getSharedSongs(tokens[i]);
-  // }
+    // get list of songs shared
+    for(i = 0; i < tokens.length; i++){
+      pArr.push(getSharedSongs(tokens[i]));
+    }
 
-  // create new spotify playlist and add songs
-  const username = 'karnrahal';
-  const playlistName = 'Shuffle3';
-  // createNewPlaylist(username, playlistName, finalSongList);
+    // create new Spotify playlist and add songs
+    const username = users[0];
+    const playlistName = 'Shuffle';
+    Promise.all(pArr).then(() => {
+      createNewPlaylist(username, playlistName, finalSongList);
+    })
 
-  res.send('You have successfully made a playlist!');
+    res.send('You have successfully made a playlist!');
+  });
 });
 
 // Start express server
 app.listen(port, () => console.log(`Shuffle listening on port ${port}!`));
-
-
-
 
 
 /*
@@ -57,27 +71,36 @@ app.listen(port, () => console.log(`Shuffle listening on port ${port}!`));
  */
 const getSharedSongs = (token) => {
   // options to get users top 50 tracks
-  const options = {
-    url: 'https://api.spotify.com/v1/me/top/tracks',
-    headers: {
-      'Authorization': 'Bearer ' + token
-    },
-    qs: {
-      'limit': 2
+  return new Promise((fulfill, reject) => {
+    try {
+      console.log(tokens);
+      const options = {
+        url: 'https://api.spotify.com/v1/me/top/tracks',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        },
+        qs: {
+          'limit': 2
+        }
+      };
+      
+      let songs = [];
+    
+      // use req spotify token to make GET req to spotify api
+      request(options, function (error, response, body) {
+        console.log('error:', error); // Print the error if one occurred
+        console.log('statusCode:', response.statusCode);
+        // console.log('body', body);
+    
+        // get top 50 songs for each user and put into seperate arrays
+        songs = JSON.parse(body).items;
+        parsed = parseSongs(songs);
+        fulfill({code: 201, body: {}});
+      });
     }
-  };
-  
-  let songs = [];
-
-  // use req spotify token to make GET req to spotify api
-  request(options, function (error, response, body) {
-    console.log('error:', error); // Print the error if one occurred
-    console.log('statusCode:', response.statusCode);
-    console.log('body', body);
-
-    // get top 50 songs for each user and put into seperate arrays
-    songs = JSON.parse(body).items;
-    parsed = parseSongs(songs);
+    catch (err) {
+      console.log("eeopd");
+    }
   });
 }
 
@@ -123,12 +146,12 @@ const parseSongs = (songsBody) => {
  * params: String username, String playlistName
  * returns: Nothing
  */
-const createNewPlaylist = (username, playlistName, songs) => {
+const createNewPlaylist = (username, playlistName, songs, token) => {
   // options to create new playlist
   const options2 = {
     url: 'https://api.spotify.com/v1/users/' + username + '/playlists',
     headers: {
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Bearer ' + originalToken,
       'Content-Type': 'application/json'
     },
     json: true,
@@ -143,9 +166,10 @@ const createNewPlaylist = (username, playlistName, songs) => {
   request.post(options2, function (error, response, body) {
     console.log('error:', error); // Print the error if one occurred
     // console.log('response', response);
-    console.log('statusCode:', response.statusCode);
+    console.log('statusCode for create playlist:', response.statusCode);
 
     playlistID = body.id;
+    console.log("PlaylistID:", playlistID);
     addSongsToPlaylist(playlistID, songs);
   });
 }
@@ -160,12 +184,12 @@ const addSongsToPlaylist = (playlistID, songs) => {
   const options3 = {
     url: 'https://api.spotify.com/v1/playlists/' + playlistID + '/tracks',
     headers: {
-      'Authorization': 'Bearer ' + token,
+      'Authorization': 'Bearer ' + originalToken,
       'Content-Type': 'application/json'
     },
     json: true,
     body: {
-      "uris": songs
+      "uris": "spotify:track:4iV5W9uYEdYUVa79Axb7Rh,spotify:track:1301WleyT98MSxVHPZCA6M"
     }
   }
   

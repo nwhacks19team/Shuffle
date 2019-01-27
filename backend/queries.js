@@ -22,6 +22,7 @@ const getTokens = (users) => {
     if (error) {
       console.log(error);
     }
+    console.log(results.rows);
     return results.rows;
   });
 }
