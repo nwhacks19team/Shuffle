@@ -7,26 +7,37 @@ const port = 3000;
 
 app.get('/', (req, res) => res.send('Hello World!'));
 
-const token = 'BQBsSq13MY5cQCarBHKV3MQnf9aSMd0dCPRBTtuHQByabhpvr2E0NEs1zOrGKpaJKikjE53HeFbq3nvCiKf9tWrwFxJhQDDqztrZE5AuwlVlZGXJZ9QRDLKq96QxRV_FUJx6m2ijyosZFeOpF7Cpf4awD9-Rii66UE3FLpzUY1RZhJaSOYDdch5z-47tpW5zPPHptGvrGoYALlPJBlg7ryGgrB9ybH7dE-8hVI0Z';
+const URIArrays = [];
+const finalSongList = [];
 
 // API endpoint - playlist generation
 // req: array of usernames
 // res: success/error message
 app.get('/playlist', (req, res) => {
-  const users = ['Karn'];
-  db.getTokens(users);
-  const tokens = []; // get tokens from req
-  
-  // get list of songs shared
-  // const songs = getSharedSongs(tokens);
+  const users = ['Karn']; // get usernames from req
+  const tokens = db.getTokens(users); // get tokens from db
 
-  // create new spotify playlist
+  console.log(tokens);
+
+  // for (token in tokens) {
+  //   console.log(token);
+  // }
+
+  // const token1 = 'BQB1cbfGOpPQHJAP0G-k3otg-s26brl7xhNT9UpQD3_YA7FpBeYmFWp55hi7qpIpgZ1_lso_K688HWsSyFs-7adChYLvCsWtXrOcRkhlBTnifij0vpWeztWLR9CMTqN4nM1D6duQJqWOzQ-EgZ0BrO1Lu1lPYHHFZ2ObbATAhVbcX5EdPl_55OMVJ9DENcj3F3rwb94u0Z10dFOv3kL4RDXgHh70iOzXG1fFRHyRpcA35aui5aAg3fH6mpg7rUCBfIvMSVBf2iG1fgQFQwop';
+  // const token2 = 'BQAARQhooJywJznW-Bk7lq44SiCEO3CFAs1mjIxccpcoTAG6z1gMermwD8NquaDxv6sDlC8xEVEW2eNJ-BlBWINCpwrYBc4-EmgVGGLIMg7NDUpsgd6-OaBx7OkfMNYO0yreuOHr32joqexc8Qt9QoMb8R1exHNHUurPXtAYRJnd78z1hkEgqRaahOib9QE9fqCisbM-qiy3vcvV6lwbrkLVdTZhnur5UoJ4Sp_r'
+  // const tokens = [];
+  // tokens.push(token1);
+  // tokens.push(token2);
+  
+  // // get list of songs shared
+  // for(i = 0; i < tokens.length; i++){
+  //   getSharedSongs(tokens[i]);
+  // }
+
+  // create new spotify playlist and add songs
   const username = 'karnrahal';
   const playlistName = 'Shuffle3';
-  // const playlistID = createNewPlaylist(username, playlistName, songs);
-  
-  // add songs to newly created playlist
-  // playlistID = '12NtAoJJrU8GIqycI8YFlR';
+  // createNewPlaylist(username, playlistName, finalSongList);
 
   res.send('You have successfully made a playlist!');
 });
@@ -42,9 +53,9 @@ app.listen(port, () => console.log(`Shuffle listening on port ${port}!`));
  * Get a list of songs common to the top 50 songs of a list of users
  *
  * params: Array[String] tokens
- * returns: Array[String] songs
+ * returns: None
  */
-const getSharedSongs = (tokens) => {
+const getSharedSongs = (token) => {
   // options to get users top 50 tracks
   const options = {
     url: 'https://api.spotify.com/v1/me/top/tracks',
@@ -66,22 +77,44 @@ const getSharedSongs = (tokens) => {
 
     // get top 50 songs for each user and put into seperate arrays
     songs = JSON.parse(body).items;
-    console.log('song', songs);
+    parsed = parseSongs(songs);
   });
-  
-  return getURIs(songs);
 }
 
 /*
  * Helper function to return a list of URIs for songs
  */
-const getURIs = (songs) => {
-  let songURIs = [];
-  for (song in songs) {
-    songURI.push(song.uri);
+const parseSongs = (songsBody) => {
+  count = 0;
+  URIArray = [];
+  for(i = 0; i < songsBody.length; i++){
+    count++;
+    songBody = songsBody[i];
+    uri = songBody.uri;
+    URIArray.push(uri)
   }
-  console.log(songURIs.length);
-  return songURIs;
+  if(count == songsBody.length){
+    URIArrays.push(URIArray);
+  }
+  if(URIArrays.length == tokens.length){
+    uarr = URIArrays[0];
+    for(i = 0; i < uarr.length; i++){
+      song = uarr[i];
+      for(j = 1; j < URIArrays.length; j++){
+        found = [];
+        for(k = 0; k < URIArrays[j].length; k++){
+          searchSong = URIArrays[j][k];
+          if(searchSong === song){
+            found.push(1)
+          }
+        }
+        if(found.length == URIArrays.length-1){
+          finalSongList.push(song);
+        }
+        found = [];
+      }
+    }
+  }
 }
 
 /*

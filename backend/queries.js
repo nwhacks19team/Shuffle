@@ -17,13 +17,12 @@ const getUsers = () => {
 };
 
 const getTokens = (users) => {
-  console.log(users);
   const text = "SELECT token FROM users WHERE username IN ($1)";
   pool.query(text, users, (error, results) => {
     if (error) {
       console.log(error);
     }
-    console.log((results.rows));
+    return results.rows;
   });
 }
 
