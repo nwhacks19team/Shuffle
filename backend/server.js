@@ -37,7 +37,7 @@ app.post('/playlist', (req, res) => {
   for(var i = 1; i <= users.length; i++) {
     params.push('$' + i);
   }
-  const text = 'SELECT token FROM users WHERE username IN (' + params.join(',') + ')';
+  const text = 'SELECT token FROM users WHERE username IN (' + params.join(',') + ') ORDER BY username';
 
   pool.query(text, users, (error, results) => {
     if (error) {
@@ -59,12 +59,16 @@ app.post('/playlist', (req, res) => {
 
     // create new Spotify playlist and add songs
     const username = users[0];
-    const playlistName = 'Shared Playlist 2';
+    const playlistName = '3 peeps';
     Promise.all(pArr).then(() => {
-      createNewPlaylist(username, playlistName);
+      createNewPlaylist(username, playlistName).then((ress) => {
+        addSongsToPlaylist(ress.body.playlistID).then(() => {
+          res.sendStatus(200);
+        })
+      })
     })
 
-    res.sendStatus(200);
+    
   });
 });
 
@@ -130,6 +134,13 @@ const parseSongs = (songsBody) => {
     URIArrays.push(URIArray);
   }
   if(URIArrays.length == tokens.length){
+    if(URIArrays.length == tokens.length){
+      for(i = 0; i < URIArrays.length; i++){
+        for(j = 0; j < 5; j++){
+          finalSongList.push(URIArrays[i][j]);
+        }
+      }
+    }
     uarr = URIArrays[0];
     for(i = 0; i < uarr.length; i++){
       song = uarr[i];
@@ -158,29 +169,37 @@ const parseSongs = (songsBody) => {
  */
 const createNewPlaylist = (username, playlistName) => {
   // options to create new playlist
-  const options2 = {
-    url: 'https://api.spotify.com/v1/users/' + username + '/playlists',
-    headers: {
-      'Authorization': 'Bearer ' + originalToken,
-      'Content-Type': 'application/json'
-    },
-    json: true,
-    body: {
-      'name': playlistName
+  return new Promise((fulfill, reject) => {
+    try {
+      const options2 = {
+        url: 'https://api.spotify.com/v1/users/' + username + '/playlists',
+        headers: {
+          'Authorization': 'Bearer ' + originalToken,
+          'Content-Type': 'application/json'
+        },
+        json: true,
+        body: {
+          'name': playlistName
+        }
+      }
+
+      let playlistID = "";
+      
+      // post request to create new shared playlist
+      request.post(options2, function (error, response, body) {
+        console.log('error:', error); // Print the error if one occurred
+        // console.log('response', response);
+        console.log('statusCode for create playlist:', response.statusCode);
+
+        playlistID = body.id;
+        console.log("PlaylistID:", playlistID);
+        fulfill({code: 201, body: {"playlistID": playlistID}});
+      });
     }
-  }
-
-  let playlistID = "";
-  
-  // post request to create new shared playlist
-  request.post(options2, function (error, response, body) {
-    console.log('error:', error); // Print the error if one occurred
-    // console.log('response', response);
-    console.log('statusCode for create playlist:', response.statusCode);
-
-    playlistID = body.id;
-    console.log("PlaylistID:", playlistID);
-    addSongsToPlaylist(playlistID);
+    catch(err){
+      console.log(err);
+      reject({code: 500, body: {}});
+    }
   });
 }
 
@@ -191,22 +210,31 @@ const createNewPlaylist = (username, playlistName) => {
  * returns: none
  */
 const addSongsToPlaylist = (playlistID) => {
-  const options3 = {
-    url: 'https://api.spotify.com/v1/playlists/' + playlistID + '/tracks',
-    headers: {
-      'Authorization': 'Bearer ' + originalToken,
-      'Content-Type': 'application/json'
-    },
-    json: true,
-    body: {
-      "uris": finalSongList
+  return new Promise((fulfill, reject) => {
+    try {
+      const options3 = {
+        url: 'https://api.spotify.com/v1/playlists/' + playlistID + '/tracks',
+        headers: {
+          'Authorization': 'Bearer ' + originalToken,
+          'Content-Type': 'application/json'
+        },
+        json: true,
+        body: {
+          "uris": finalSongList
+        }
+      }
+      
+      // put request to add songs from shared_arr
+      request.post(options3, function (error, response, body) {
+        console.log('error:', error); // Print the error if one occurred
+        // console.log('response', response);
+        console.log('statusCode for playlistid:', response.statusCode);
+        fulfill({code: 201, body: {}});
+      });
     }
-  }
-  
-  // put request to add songs from shared_arr
-  request.post(options3, function (error, response, body) {
-    console.log('error:', error); // Print the error if one occurred
-    // console.log('response', response);
-    console.log('statusCode for playlistid:', response.statusCode);
+    catch(err){
+      console.log(err);
+      reject({code: 500, body: {}});
+    }
   });
-};
+}
