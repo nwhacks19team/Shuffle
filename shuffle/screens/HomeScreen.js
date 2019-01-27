@@ -9,11 +9,13 @@ import {
   View,
   Button,
   Picker,
+  Alert,
 } from 'react-native';
 import { WebBrowser } from 'expo';
 import SelectMultiple from 'react-native-select-multiple'
 
 import { MonoText } from '../components/StyledText';
+import { TextInput } from 'react-native-gesture-handler';
 
 export default class HomeScreen extends React.Component {
 
@@ -41,7 +43,7 @@ export default class HomeScreen extends React.Component {
             style={styles.generateButton}
             onPress={this._generateSet}
             title="Generate a Playlist"
-          />
+          /> 
         </View>
       </View>
     );
@@ -75,19 +77,47 @@ export default class HomeScreen extends React.Component {
   };
 
   _generateSet = () => {
-    console.log(this.state.selectedUsers);
+    //console.log(this.state.selectedUsers);
 
+    selectedUsers = [];
+
+    this.state.selectedUsers.forEach((object) =>{
+      selectedUsers.push(object.value);
+    });
     
+    console.log(JSON.stringify({
+      users: selectedUsers,
+    }));
+
+    console.log(playlistName);
+
+    fetch("http://10.19.130.200:8080" + "/playlist/", {
+      method: "POST",
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        users: selectedUsers
+      })
+    }).then(Alert.alert("Playlist has been generated!"))
+      .catch((error) => {
+        console.log("Unable to connect to server." + error);
+        Alert.alert("Unable to connect to server." + error);
+      });
+
   }
 }
 
 const users = [
-  { label: 'Arjan', value: 'arjansandhu' },
-  { label: 'Jennifer', value: 'idk' },
-  { label: 'Karan', value: 'karanrahal' },
-  { label: 'Pahal', value: 'dontClickThisMans' },
-  { label: 'Nishat', value: 'nishnish97' }
+  { label: 'Arjan', value: 'arjan97' },
+  { label: 'Jennifer', value: 'jenjenngo' },
+  { label: 'Karn', value: 'karnrahal' },
+  { label: 'Nishat', value: 'nishnish97' },
+  { label: 'Pahul', value: 'pahul' }
 ]
+
+const playlistName = '';
 
 const styles = StyleSheet.create({
   container: {
