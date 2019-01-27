@@ -59,7 +59,7 @@ app.post('/playlist', (req, res) => {
 
     // create new Spotify playlist and add songs
     const username = users[0];
-    const playlistName = '3 peeps';
+    const playlistName = 'Shuffle Shared Playlist';
     Promise.all(pArr).then(() => {
       createNewPlaylist(username, playlistName).then((ress) => {
         addSongsToPlaylist(ress.body.playlistID).then(() => {
