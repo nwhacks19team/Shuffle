@@ -8,12 +8,20 @@ import {
   TouchableOpacity,
   View,
   Button,
+  Picker,
 } from 'react-native';
 import { WebBrowser } from 'expo';
 
 import { MonoText } from '../components/StyledText';
 
 export default class HomeScreen extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = { /* initial state */ };
+    selected.clear();
+  }
+
   static navigationOptions = {
     header: null,
   };
@@ -28,62 +36,26 @@ export default class HomeScreen extends React.Component {
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           
           <View style={styles.userContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>User 1</Text>
+            <TouchableOpacity onPress={this._handleUserPress("arjan")} style={styles.userLink}>
+              <Text style={styles.userLinkText}>Arjan</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.userContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>User 2</Text>
+            <TouchableOpacity onPress={this._handleUserPress("jennifer")} style={styles.userLink}>
+              <Text style={styles.userLinkText}>Jennifer</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.userContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>User 3</Text>
+            <TouchableOpacity onPress={this._handleUserPress("karan")} style={styles.userLink}>
+              <Text style={styles.userLinkText}>Karan</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.userContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>User 4</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.userContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>User 5</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.userContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>User 6</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.userContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>User 7</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.userContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>User 8</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.userContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>User 5</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.userContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>User 5</Text>
+            <TouchableOpacity onPress={this._handleUserPress("pahal")} style={styles.userLink}>
+              <Text style={styles.userLinkText}>Pahal</Text>
             </TouchableOpacity>
           </View>
 
@@ -91,6 +63,7 @@ export default class HomeScreen extends React.Component {
 
         <View style={styles.tabBarInfoContainer}>
           <Button
+            style={styles.generateButton}
             onPress={()=>{}}
             title="Generate"
           />
@@ -126,12 +99,21 @@ export default class HomeScreen extends React.Component {
     WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
   };
 
-  _handleHelpPress = () => {
-    WebBrowser.openBrowserAsync(
-      'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-    );
+  _handleUserPress = (user) => {
+
+    if(selected.has(user)){
+      selected.delete(user);
+    }
+    else{
+      selected.add(user);
+    }
+    
+    console.log(selected)
   };
 }
+
+var selected = new Set()
+
 
 const styles = StyleSheet.create({
   container: {
@@ -211,14 +193,17 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   userContainer: {
-    marginTop: 15,
+    marginTop: 20,
     alignItems: 'center',
   },
-  helpLink: {
+  userLink: {
     paddingVertical: 15,
   },
-  helpLinkText: {
-    fontSize: 18,
+  userLinkText: {
+    fontSize: 22,
     color: '#2e78b7',
+  },
+  generateButton: {
+
   },
 });
