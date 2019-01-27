@@ -1,100 +1,131 @@
 const express = require('express');
 const request = require('request');
 
-
 const app = express();
 const port = 3000;
 
 app.get('/', (req, res) => res.send('Hello World!'));
 
-// options to get users top 50 tracks
-const options = {
-  url: 'https://api.spotify.com/v1/me/top/tracks',
-  headers: {
-    'Authorization': 'Bearer BQBXT2wxeu4zPC9HV0LOHdBAq4KG40Isr3NXZzNdr8BNi-RuU87X4u0MAhwhDSCDNJPVP-7wP72jYkY8tlggsuDcMkLZDjgK4WFbcLUmjHfwyM5o0_R3GrDyRxYvBUIprzsKrT6EvFf3bPRIoYdshlwh3zratw36UsW2YJlvniUkd7i0ypTyld-a1aFFiwjgVEruBXC4Dufj2yC2nBCgbxv_bT06hiTsgu5IdtL_'
-  },
-  qs: {
-    'limit': 2
-  }
-};
-
-// options to create new playlist
-const options2 = {
-  url: 'https://api.spotify.com/v1/users/karnrahal/playlists',
-  headers: {
-    'Authorization': 'Bearer BQBXT2wxeu4zPC9HV0LOHdBAq4KG40Isr3NXZzNdr8BNi-RuU87X4u0MAhwhDSCDNJPVP-7wP72jYkY8tlggsuDcMkLZDjgK4WFbcLUmjHfwyM5o0_R3GrDyRxYvBUIprzsKrT6EvFf3bPRIoYdshlwh3zratw36UsW2YJlvniUkd7i0ypTyld-a1aFFiwjgVEruBXC4Dufj2yC2nBCgbxv_bT06hiTsgu5IdtL_',
-    'Content-Type': 'application/json'
-  },
-  json: true,
-  body: {
-    'name': 'shared'
-  }
-}
-
-// options to add songs to playlist
-const options3 = {
-  url: 'https://api.spotify.com/v1/playlists/{playlist_id}/tracks',
-  headers: {
-    'Authorization': 'Bearer BQBXT2wxeu4zPC9HV0LOHdBAq4KG40Isr3NXZzNdr8BNi-RuU87X4u0MAhwhDSCDNJPVP-7wP72jYkY8tlggsuDcMkLZDjgK4WFbcLUmjHfwyM5o0_R3GrDyRxYvBUIprzsKrT6EvFf3bPRIoYdshlwh3zratw36UsW2YJlvniUkd7i0ypTyld-a1aFFiwjgVEruBXC4Dufj2yC2nBCgbxv_bT06hiTsgu5IdtL_',
-    'Content-Type': 'application/json'
-  },
-  json: true,
-  body: {
-    'name': 'shared'
-  }
-}
+const token = 'BQCim05-9AH1BryxdJbUtRdn7hNFDaF2sAdq7NhPH2X5BUuPqndhqNVK_IAdmy3tVhnPCbqODd-cQ-TFblU';
 
 // API endpoint - playlist generation
 // req: array of usernames
 // res: success/error message
 app.get('/playlist', (req, res) => {
-  let items = [];
+  const tokens = [];
+  
+  // get list of songs shared
+  const songs = getSharedSongs();
+
+  // // create new spotify playlist
+  // const username = 'karnrahal';
+  // const playlistName = 'Shuffle';
+  // let playlistID = createNewPlaylist(username, playlistName);
+  
+  // // add songs to newly created playlist
+  // playlistID = '12NtAoJJrU8GIqycI8YFlR';
+  // addSongsToPlaylist(playlistID, songs);
+
+  res.send('You have successfully made a playlist!');
+});
+
+// Start express server
+app.listen(port, () => console.log(`Shuffle listening on port ${port}!`));
+
+
+
+
+
+/*
+ * Get a list of songs common to the top 50 songs of a list of users
+ *
+ * params: Array[String] tokens
+ * returns: Array[String] songs
+ */
+const getSharedSongs = (tokens) => {
+  // options to get users top 50 tracks
+  const options = {
+    url: 'https://api.spotify.com/v1/me/top/tracks',
+    headers: {
+      'Authorization': 'Bearer ' + token
+    },
+    qs: {
+      'limit': 2
+    }
+  };
+  
+  let songs = [];
 
   // use req spotify token to make GET req to spotify api
-  // request(options, function (error, response, body) {
-  //   console.log('error:', error); // Print the error if one occurred
-  //   console.log('statusCode:', response.statusCode);
+  request(options, function (error, response, body) {
+    console.log('error:', error); // Print the error if one occurred
+    console.log('statusCode:', response.statusCode);
+    console.log('body', body);
 
-  //   // get top 50 songs for each user and put into seperate arrays
-  //   items = JSON.parse(body).items;
-  // });
+    // get top 50 songs for each user and put into seperate arrays
+    songs = JSON.parse(body).items;
+  });
   
-  // console.log(items);
-  
-  // // find intersection of seperate arrays to build shared_arr
-  // let shared_arr = [];
-  // getArrayIntersection();
+  return songs;
+}
 
+/*
+ * Create new playlist for the specified user
+ *
+ * params: String username, String playlistName
+ * returns: String playlistID
+ */
+const createNewPlaylist = (username, playlistName) => {
+  // options to create new playlist
+  const options2 = {
+    url: 'https://api.spotify.com/v1/users/' + username + '/playlists',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json'
+    },
+    json: true,
+    body: {
+      'name': playlistName
+    }
+  }
 
   // post request to create new shared playlist
+  let playlistID = "";
+  
   request.post(options2, function (error, response, body) {
     console.log('error:', error); // Print the error if one occurred
     console.log('response', response);
     console.log('statusCode:', response.statusCode);
+
+    playlistID = body.id;
   });
+  
+  return playlistID;
+}
 
-  const playlistID = JSON.parse(body).id;
-
+/*
+ * Add songs to a spotify playlist with specified id
+ *
+ * params: String playlstID, Array songs
+ * returns: none
+ */
+const addSongsToPlaylist = (playlistID, songs) => {
+  const options3 = {
+    url: 'https://api.spotify.com/v1/playlists/' + playlistID + '/tracks',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json'
+    },
+    json: true,
+    body: {
+      "uris": ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh","spotify:track:1301WleyT98MSxVHPZCA6M"]
+    }
+  }
+  
   // put request to add songs from shared_arr
   request.post(options3, function (error, response, body) {
     console.log('error:', error); // Print the error if one occurred
     console.log('response', response);
     console.log('statusCode:', response.statusCode);
   });
-
-
-
-  res.send('You have successfully made a playlist!');
-});
-
-
-
-
-
-
-app.listen(port, () => console.log(`Shuffle listening on port ${port}!`));
-
-
-const getArrayIntersection = () => {
-
 };
