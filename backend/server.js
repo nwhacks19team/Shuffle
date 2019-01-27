@@ -1,5 +1,6 @@
 const express = require('express');
 const request = require('request');
+const db = require('./queries')
 
 const app = express();
 const port = 3000;
@@ -12,6 +13,8 @@ const token = 'BQBsSq13MY5cQCarBHKV3MQnf9aSMd0dCPRBTtuHQByabhpvr2E0NEs1zOrGKpaJK
 // req: array of usernames
 // res: success/error message
 app.get('/playlist', (req, res) => {
+  const users = ['Karn'];
+  db.getTokens(users);
   const tokens = []; // get tokens from req
   
   // get list of songs shared
@@ -20,7 +23,7 @@ app.get('/playlist', (req, res) => {
   // create new spotify playlist
   const username = 'karnrahal';
   const playlistName = 'Shuffle3';
-  const playlistID = createNewPlaylist(username, playlistName, songs);
+  // const playlistID = createNewPlaylist(username, playlistName, songs);
   
   // add songs to newly created playlist
   // playlistID = '12NtAoJJrU8GIqycI8YFlR';
