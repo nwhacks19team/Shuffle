@@ -17,7 +17,7 @@ app.get('/', (req, res) => res.send('Hello World!'));
 
 const URIArrays = [];
 const finalSongList = [];
-const originalToken = 'BQAiq3602hqfTY00VZOhlsAwIkTLcFSXIi8DbQdlsVBPDToz6vTpLsI6PfbZ5diDTDe3X1kLwhZmjheU5BCiKFWNl4ct4mQbtXAqsvQ7S5IFvEx2lEaxUZ0QZuTy8lWmgTbubtkDp_ZPQ9xMMZEncgJXu2pN2vktOOE6tmOmi0WogU2A_Gmj_g4n6wGBdNSYnTiYGlz_IozezGIUe1TPxF_neY3Q59jPx';
+const originalToken = 'BQDN8bENR9sKLkPm_hlwEBlp87S-Z_2EYQhckA7CFmm56bBW4Xlza0VL7kWE1Iq-Pr6bUIpqnhqMKygS6gvGYxMfPWKeA971OVqfxi9WNjCHhboj9fxXunXw94Qm4wtW70GGm6bcdeBKdSI-IwSJ9Eu8dGevcPIAgWfgjMFzE6zUKEx16gQxdPm5zQxH_Lwoqsusjf2pAtmtx-4zSbnqFUdxOcuvDoBX4lK5tk0G';
 const tokens = [];
 let pArr = [];
 
@@ -49,7 +49,7 @@ app.get('/playlist', async (req, res) => {
     }
 
     // create new Spotify playlist and add songs
-    const username = users[0];
+    const username = 'karnrahal';
     const playlistName = 'Shuffle';
     Promise.all(pArr).then(() => {
       createNewPlaylist(username, playlistName, finalSongList);
@@ -71,16 +71,16 @@ app.listen(port, () => console.log(`Shuffle listening on port ${port}!`));
  */
 const getSharedSongs = (token) => {
   // options to get users top 50 tracks
+  // token = 'BQDN8bENR9sKLkPm_hlwEBlp87S-Z_2EYQhckA7CFmm56bBW4Xlza0VL7kWE1Iq-Pr6bUIpqnhqMKygS6gvGYxMfPWKeA971OVqfxi9WNjCHhboj9fxXunXw94Qm4wtW70GGm6bcdeBKdSI-IwSJ9Eu8dGevcPIAgWfgjMFzE6zUKEx16gQxdPm5zQxH_Lwoqsusjf2pAtmtx-4zSbnqFUdxOcuvDoBX4lK5tk0G';
   return new Promise((fulfill, reject) => {
     try {
-      console.log(tokens);
       const options = {
         url: 'https://api.spotify.com/v1/me/top/tracks',
         headers: {
           'Authorization': 'Bearer ' + token
         },
         qs: {
-          'limit': 2
+          'limit': 50
         }
       };
       
@@ -88,6 +88,7 @@ const getSharedSongs = (token) => {
     
       // use req spotify token to make GET req to spotify api
       request(options, function (error, response, body) {
+        console.log('thi:', token);
         console.log('error:', error); // Print the error if one occurred
         console.log('statusCode:', response.statusCode);
         // console.log('body', body);
@@ -100,6 +101,7 @@ const getSharedSongs = (token) => {
     }
     catch (err) {
       console.log("eeopd");
+      reject({code: 500, body: {}});
     }
   });
 }
@@ -165,7 +167,7 @@ const createNewPlaylist = (username, playlistName, songs, token) => {
   // post request to create new shared playlist
   request.post(options2, function (error, response, body) {
     console.log('error:', error); // Print the error if one occurred
-    // console.log('response', response);
+    console.log('response', response);
     console.log('statusCode for create playlist:', response.statusCode);
 
     playlistID = body.id;
@@ -189,14 +191,14 @@ const addSongsToPlaylist = (playlistID, songs) => {
     },
     json: true,
     body: {
-      "uris": "spotify:track:4iV5W9uYEdYUVa79Axb7Rh,spotify:track:1301WleyT98MSxVHPZCA6M"
+      "uris": finalSongList
     }
   }
   
   // put request to add songs from shared_arr
   request.post(options3, function (error, response, body) {
     console.log('error:', error); // Print the error if one occurred
-    // console.log('response', response);
+    console.log('response', response);
     console.log('statusCode for playlistid:', response.statusCode);
   });
 };
